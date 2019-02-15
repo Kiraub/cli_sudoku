@@ -2,18 +2,31 @@ startletter = 'A'
 endletter = 'I'
 samebox = [ ['A','B','C'], ['D','E','F'], ['G','H','I'] ]
 init = ""
+counter = 0
 for l in range( ord(startletter),ord(endletter)+1 ):
     letter = chr(l)
     init += "num('"+letter.lower()+"').\n"
-init += "\nsolver :-\n"
+init += "\
+atom_list_concat([H|T], Cat):-\n\
+    atom_list_concat(H,T,Cat).\n\
+atom_list_concat(Cat,[],Cat).\n\
+atom_list_concat(A,[H|T],Cat) :-\n\
+    atom_concat(A,H,ACat),\n\
+    atom_list_concat(ACat,T,Cat).\n\
+"
+init += "\nsolver(Sample) :-\n((not(atom(Sample)),Isatom=no,Length=0);(atom(Sample),atom_length(Sample,Length),Isatom=yes)),"
 for x in range( ord(startletter),ord(endletter)+1 ):
     for y in range( ord(startletter),ord(endletter)+1 ):
         varname = chr(x)+chr(y)
         xbox = []
         ybox = []
         same = []
-        init += ("%% set as number\n")
+        init += "\n%% "+varname+"\n"
         init += "num("+varname+"),\n"
+        init += "((Isatom=yes,Length>0,sub_atom(Sample, "+str(counter)+",1,_,"+varname+"));(Isatom=no;Length<"+str(counter+1)+")),\n"
+        #init += ("\n%% set as number\n")
+        #init += ");(Isatom=yes,sub_atom(Sample, "+str(counter)+",1,_,"+varname+"),num("+varname+"))),\n"
+        counter += 1
         init += ("%% same row:\n")
         for yn in range( ord(startletter), y):
             init += varname+"\\="+chr(x)+chr(yn)+","
@@ -26,6 +39,8 @@ for x in range( ord(startletter),ord(endletter)+1 ):
             same.append(chr(xn)+chr(y))
         if x > ord(startletter):
             init += '\n'
+        if endletter != 'I':
+            continue
         if x==y:
             init += ("%% tl-dr diagonal:\n")
             for dn in range(ord(startletter), x):
@@ -51,12 +66,22 @@ for x in range( ord(startletter),ord(endletter)+1 ):
                         init += varname+"\\="+xb+yb+","
         init += '\n'
     init += '\n'
-init += "write(\"###Start\\n\"),\n"
+
+#init += "write(\"###Start\\n\"),\n"
+string_list = "atom_list_concat(["
 for x in range( ord(startletter),ord(endletter)+1 ):
     for y in range( ord(startletter),ord(endletter)+1 ):
         varname = chr(x)+chr(y)
-        init += "write("+varname+"),"
-    init += "write(\"\\n\"),\n"
-init += "write(\"###End\\n\"),\n"
-init += "\nfail."
+        #init += "write("+varname+"),"
+        #init += "term_string("+varname+","+varname+"string),"
+        if x != ord(startletter) or y > ord(startletter):
+            string_list += ","
+        string_list += varname
+    #init += "\n"
+string_list += "],LongAtom),\nterm_string(LongAtom,LongString),\nwrite(\"Solution\\n\\t\"),\nwrite(LongString),\nwrite(\"\\n\"),\nfail."
+
+#init += "write(\"###End\\n\"),\n"
+#init += "\nfail."
+
 print(init)
+print(string_list)
