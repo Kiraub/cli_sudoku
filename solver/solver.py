@@ -20,7 +20,7 @@ main([_|H]):-\n\
     write(H),\n\
     write(\">Answer:<\"),\n\
     (H=[Arg|_],solver(Arg);write(\"false\")),\n\
-    write(\">\\n\").\n\
+    write(\">\").\n\
 "
 init += "\nsolver(Sample) :-\n((not(atom(Sample)),Isatom=no,Length=0);(atom(Sample),atom_length(Sample,Length),Isatom=yes)),"
 for x in range( ord(startletter),ord(endletter)+1 ):

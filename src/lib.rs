@@ -121,4 +121,35 @@ mod tests {
         let a = Action::parse("mark 1 1 1").unwrap();
         assert_eq!(format!("{}", a), "ActionType: mark\nPosition: (1, 1)\nValue: 1")
     }
+
+    #[test]
+    fn prolog_value() {
+        use parts::{
+            value::Value,
+        };
+        let a = Value::One.to_prolog();
+        assert_eq!(format!("{}", a), "a");
+    }
+
+    #[test]
+    fn board_to_prolog() {
+        use parts::{
+            board::Board,
+        };
+        let b = Board::new();
+        let p = b.to_prolog();
+        assert_eq!(format!("{}", &p[0..9]), "xxxxxxxxx");
+    }
+
+    #[test]
+    fn check_fill_action() {
+        use parts::{
+            board::Board,
+            value::Value,
+            point::Point,
+        };
+        let b = Board::new();
+        let p = Point{x:Value::One,y:Value::One};
+        assert_eq!(format!("{}", b.check_fill(Value::One, p)), "true");
+    }
 }

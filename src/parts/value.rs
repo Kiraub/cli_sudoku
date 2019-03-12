@@ -48,6 +48,22 @@ impl Value {
             Empty => 0,
         }
     }
+
+    pub fn to_prolog(&self) -> char {
+        use Value::*;
+        match self {
+            One => 'a',
+            Two => 'b',
+            Three => 'c',
+            Four => 'd',
+            Five => 'e',
+            Six => 'f',
+            Seven => 'g',
+            Eight => 'h',
+            Nine => 'i',
+            Empty => 'x',
+        }
+    }
 }
 
 impl fmt::Display for Value {

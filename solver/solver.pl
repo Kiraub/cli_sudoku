@@ -21,7 +21,7 @@ main([_|H]):-
     write(H),
     write(">Answer:<"),
     (H=[Arg|_],solver(Arg);write("false")),
-    write(">\n").
+    write(">").
 
 solver(Sample) :-
 ((not(atom(Sample)),Isatom=no,Length=0);(atom(Sample),atom_length(Sample,Length),Isatom=yes)),
