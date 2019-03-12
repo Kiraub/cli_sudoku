@@ -15,12 +15,12 @@ atom_list_concat(A,[H|T],Cat) :-
     atom_concat(A,H,ACat),
     atom_list_concat(ACat,T,Cat).
 
-:- initialization(main, main).
-main([H|_]):-
+%:- initialization(main, main).
+main([_|H]):-
     write("Input:<"),
     write(H),
     write(">Answer:<"),
-    (solver(H);write("false")),
+    (H=[Arg|_],solver(Arg);write("false")),
     write(">\n").
 
 solver(Sample) :-
