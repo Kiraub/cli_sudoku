@@ -67,8 +67,9 @@ for x in range( ord(startletter),ord(endletter)+1 ):
                         init += varname+"\\="+xb+yb+","
         init += '\n'
     init += '\n'
-
+init += "write(\"Found valid solution.\").\n"
 #init += "write(\"###Start\\n\"),\n"
+"""
 string_list = "atom_list_concat(["
 for x in range( ord(startletter),ord(endletter)+1 ):
     for y in range( ord(startletter),ord(endletter)+1 ):
@@ -80,9 +81,9 @@ for x in range( ord(startletter),ord(endletter)+1 ):
         string_list += varname
     #init += "\n"
 string_list += "],LongAtom),\nterm_string(LongAtom,LongString),\nwrite(\"Solution\\n\\t\"),\nwrite(LongString),\nwrite(\"\\n\"),\nfail."
-
+"""
 #init += "write(\"###End\\n\"),\n"
 #init += "\nfail."
 
 print(init)
-print(string_list)
+#print(string_list)
