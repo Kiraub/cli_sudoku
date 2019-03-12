@@ -15,6 +15,14 @@ atom_list_concat(A,[H|T],Cat) :-
     atom_concat(A,H,ACat),
     atom_list_concat(ACat,T,Cat).
 
+:- initialization(main, main).
+main([H|_]):-
+    write("Input:<"),
+    write(H),
+    write(">Answer:<"),
+    (solver(H);write("false")),
+    write(">\n").
+
 solver(Sample) :-
 ((not(atom(Sample)),Isatom=no,Length=0);(atom(Sample),atom_length(Sample,Length),Isatom=yes)),
 %% AA
@@ -853,5 +861,5 @@ II\=AA,II\=BB,II\=CC,II\=DD,II\=EE,II\=FF,II\=GG,II\=HH,
 %% same-box:
 II\=HG,II\=GH,
 
-write("Found valid solution.").
+write("true").
 

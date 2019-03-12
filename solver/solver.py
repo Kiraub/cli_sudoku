@@ -14,6 +14,13 @@ atom_list_concat(Cat,[],Cat).\n\
 atom_list_concat(A,[H|T],Cat) :-\n\
     atom_concat(A,H,ACat),\n\
     atom_list_concat(ACat,T,Cat).\n\
+\n:- initialization(main, main).\n\
+main([H|_]):-\n\
+    write(\"Input:<\"),\n\
+    write(H),\n\
+    write(\">Answer:<\"),\n\
+    (solver(H);write(\"false\")),\n\
+    write(\">\\n\").\n\
 "
 init += "\nsolver(Sample) :-\n((not(atom(Sample)),Isatom=no,Length=0);(atom(Sample),atom_length(Sample,Length),Isatom=yes)),"
 for x in range( ord(startletter),ord(endletter)+1 ):
@@ -67,7 +74,7 @@ for x in range( ord(startletter),ord(endletter)+1 ):
                         init += varname+"\\="+xb+yb+","
         init += '\n'
     init += '\n'
-init += "write(\"Found valid solution.\").\n"
+init += "write(\"true\").\n"
 #init += "write(\"###Start\\n\"),\n"
 """
 string_list = "atom_list_concat(["
