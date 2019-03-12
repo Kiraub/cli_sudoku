@@ -3,6 +3,7 @@ endletter = 'I'
 samebox = [ ['A','B','C'], ['D','E','F'], ['G','H','I'] ]
 init = ""
 counter = 0
+init += "empty('x').\n"
 for l in range( ord(startletter),ord(endletter)+1 ):
     letter = chr(l)
     init += "num('"+letter.lower()+"').\n"
@@ -23,7 +24,7 @@ for x in range( ord(startletter),ord(endletter)+1 ):
         same = []
         init += "\n%% "+varname+"\n"
         init += "num("+varname+"),\n"
-        init += "((Isatom=yes,Length>0,sub_atom(Sample, "+str(counter)+",1,_,"+varname+"));(Isatom=no;Length<"+str(counter+1)+")),\n"
+        init += "((Isatom=yes,Length>0,sub_atom(Sample, "+str(counter)+",1,_,"+varname+"));(Isatom=no;Length<"+str(counter+1)+");(sub_atom(Sample, "+str(counter)+",1,_,"+varname+"E),empty("+varname+"E))),\n"
         #init += ("\n%% set as number\n")
         #init += ");(Isatom=yes,sub_atom(Sample, "+str(counter)+",1,_,"+varname+"),num("+varname+"))),\n"
         counter += 1
