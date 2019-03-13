@@ -10,10 +10,9 @@ mod parts;
 use parts::{
     action::Action,
     action::ActionType,
+    action::ActionHandler,
     config::Config,
     board::Board,
-    //point::Point,
-    //value::Value,
 };
 
 pub fn parse(args: &[String]) -> Result<Config, &'static str> {
@@ -34,18 +33,6 @@ pub fn parse(args: &[String]) -> Result<Config, &'static str> {
 }
 
 pub fn run(mut config: Config) -> Result<(), Box<dyn Error>> {
-/*
-    println!("Number of hints given: {}", config.get_hints());
-
-    let mut input = String::new();
-    if let Err(e) = io::stdin().read_line(&mut input) {
-        println!("Read failed: {}", e);
-    }
-    match Action::parse(&input) {
-        Ok(act) => println!("{}", act),
-        Err(msg) => println!("{}", msg),
-    };
-    */
     let mut board = Board::new();
     let mut action : Action;
     println!("{}", board);

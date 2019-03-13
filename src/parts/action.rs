@@ -206,3 +206,8 @@ impl fmt::Display for Action {
         write!(f, "{}", a)
     }
 }
+
+pub trait ActionHandler {
+    /// Perform an action that may change the data of the implementor type and returns a result message
+    fn do_action(&mut self, action: Action) -> String;
+}

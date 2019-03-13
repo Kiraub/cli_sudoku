@@ -34,6 +34,7 @@ impl Board {
         self.values = [Value::Empty; VMAX];
     }
 
+    //TODO: use trait ActionHandler
     pub fn do_action(&mut self, action: Action) {
         let pos = action.get_position();
         match action.get_type() {

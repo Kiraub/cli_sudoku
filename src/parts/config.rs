@@ -3,7 +3,10 @@ use std::{
     fmt,
     collections::HashMap,
 };
-use super::action::Action;
+use super::action::{
+    Action,
+    ActionHandler,
+};
 
 enum ConfigEntry {
     Number(usize),
@@ -52,25 +55,6 @@ impl Config {
         Config { map }
     }
 
-    pub fn do_action(&mut self, action: Action) -> String {
-        let mut ret_str = String::new();
-        let entry_key = action.get_map_key();
-        let entry_val = action.get_map_value();
-        if entry_key.len() == 0 {
-            for key in self.map.keys() {
-                ret_str.push_str(&format!("{}:= {}\n", &key, self.get_option(&key).unwrap())[..]);
-            }
-        } else if entry_val.len() == 0 {
-            ret_str.push_str(&format!("{}:= {}\n", &entry_key, self.get_option(&entry_key).unwrap())[..]);
-        } else {
-            match self.set_option(entry_key, entry_val) {
-                Ok(_) => ret_str.push_str("Successfully changed config\n"),
-                Err(e) => ret_str.push_str(&format!("Error changing config: {}\n", e)[..]),
-            }
-        }
-        ret_str
-    }
-
     fn get_option(&self, entry_key: &str) -> Result<&ConfigEntry, &'static str> {
         if let Some(entry) = self.map.get(entry_key) {
             Ok(entry)
@@ -111,5 +95,26 @@ impl Config {
 impl fmt::Display for Config {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "Configuration:\n\tHints: \n\tStrict: "/*, self.get_hints(), self.get_strict_mode()*/)
+    }
+}
+
+impl ActionHandler for Config {
+    fn do_action(&mut self, action: Action) -> String {
+        let mut ret_str = String::new();
+        let entry_key = action.get_map_key();
+        let entry_val = action.get_map_value();
+        if entry_key.len() == 0 {
+            for key in self.map.keys() {
+                ret_str.push_str(&format!("{}:= {}\n", &key, self.get_option(&key).unwrap())[..]);
+            }
+        } else if entry_val.len() == 0 {
+            ret_str.push_str(&format!("{}:= {}\n", &entry_key, self.get_option(&entry_key).unwrap())[..]);
+        } else {
+            match self.set_option(entry_key, entry_val) {
+                Ok(_) => ret_str.push_str("Successfully changed config\n"),
+                Err(e) => ret_str.push_str(&format!("Error changing config: {}\n", e)[..]),
+            }
+        }
+        ret_str
     }
 }
