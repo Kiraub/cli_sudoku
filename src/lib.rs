@@ -19,16 +19,21 @@ use parts::{
 pub fn parse(args: &[String]) -> Result<Config, &'static str> {
     let hints = match args.len() {
         1 => 0,
-        2 => match u32::from_str_radix(args[1].trim(), 10) {
+        2 => match usize::from_str_radix(args[1].trim(), 10) {
             Ok(u) => u,
             Err(_) => return Err("Invalid number of hints"),
         },
         _ => return Err("Too many arguments"),
     };
-    Ok( Config::new(hints) )
+    let mut c = Config::new();
+    let mut s = "config hints ".to_string();
+    s.push_str(&hints.to_string()[..]);
+    let a = Action::parse(&s[..]).unwrap();
+    c.do_action(a);
+    Ok( c )
 }
 
-pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
+pub fn run(mut config: Config) -> Result<(), Box<dyn Error>> {
 /*
     println!("Number of hints given: {}", config.get_hints());
 
@@ -62,9 +67,9 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
             Quit => break,
             New => board.reset(),
             Help => action.get_help(),
-            Mark => (),
-            Unmark => (),
-            Config => println!("{}", config),
+            Mark => println!("Not yet implemented"),
+            Unmark => println!("Not yet implemented"),
+            Config => println!("{}", config.do_action(action)),
             Fill => board.do_action(action),
             Erase => board.do_action(action),
         }

@@ -76,11 +76,40 @@ impl fmt::Display for ActionType {
     }
 }
 
+impl PartialEq for ActionType {
+    fn eq(&self, other: &ActionType) -> bool {
+        use ActionType::*;
+        let type_self = match self {
+            Quit => 0,
+            New => 1,
+            Config => 2,
+            Help => 3,
+            Mark => 4,
+            Unmark => 5,
+            Fill => 6,
+            Erase => 7,
+        };
+        let type_other = match other {
+            Quit => 0,
+            New => 1,
+            Config => 2,
+            Help => 3,
+            Mark => 4,
+            Unmark => 5,
+            Fill => 6,
+            Erase => 7,
+        };
+        type_self == type_other
+    }
+}
+
 pub struct Action {
     atype: ActionType,
     pos: Point,
     val: Value,
     htype: ActionType,
+    map_key: String,
+    map_value: String,
 }
 
 impl Action {
@@ -108,7 +137,15 @@ impl Action {
                         } else {Ok( Action{ atype, ..filler})}
                     },
                     ActionType::Config => {
-                        Ok( Action { atype, ..filler})
+                        if let Some(map_key_str) = input.next() {
+                            if let Some(map_value_str) = input.next() {
+                                Ok( Action { atype, map_key: map_key_str.to_string(), map_value: map_value_str.to_string(), ..filler})
+                            } else {
+                                Ok( Action { atype, map_key: map_key_str.to_string(), ..filler})
+                            }
+                        } else {
+                            Ok( Action { atype, ..filler})
+                        }
                     },
                     _ => {
                         if let Some(xstr) = input.next() {
@@ -124,9 +161,9 @@ impl Action {
                                             } else {unknown(valstr)}
                                         } else {missing("Number")}
                                     } else {unknown(ystr)}
-                                } else {missing("Y-Coordinate")}
+                                } else {missing("Row")}
                             } else {unknown(xstr)}
-                        } else {missing("X-Coordinate")}
+                        } else {missing("Column")}
                     }
                 }
             } else {unknown(atypestr)}
@@ -135,7 +172,7 @@ impl Action {
 
     pub fn default_action() -> Action {
         use Value::Empty;
-        Action { atype: ActionType::Help, pos: Point{x: Empty, y: Empty}, val: Empty, htype: ActionType::Help}
+        Action { atype: ActionType::Help, pos: Point{x: Empty, y: Empty}, val: Empty, htype: ActionType::Help, map_key: "".to_string(), map_value: "".to_string()}
     }
 
     pub fn get_type(&self) -> ActionType {
@@ -148,6 +185,14 @@ impl Action {
 
     pub fn get_value(&self) -> Value {
         self.val
+    }
+
+    pub fn get_map_key(&self) -> &str {
+        &self.map_key[..]
+    }
+
+    pub fn get_map_value(&self) -> &str {
+        &self.map_value[..]
     }
 
     pub fn get_help(&self) {

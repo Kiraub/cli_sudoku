@@ -66,7 +66,7 @@ impl Board {
         let r_index = Board::get_index(pos);
         let mut prolog_input = self.to_prolog();
         prolog_input.replace_range(r_index..r_index+1, &r_string );
-        eprintln!("input: {}", &prolog_input);
+        //eprintln!("input: {}", &prolog_input);
         let prolog_output = if cfg!(target_os = "windows") {
             let mut win_pl_arg = String::from(".\\solver\\solver.exe ");
             win_pl_arg.push_str(&prolog_input);
@@ -83,12 +83,7 @@ impl Board {
                     .output()
                     .expect("failed to execute process")
         };
-        //eprintln!("status: {}", prolog_output.status);
         let out = String::from_utf8(prolog_output.stdout).unwrap();
-        eprintln!("stdout: {}", out);
-        let err = String::from_utf8(prolog_output.stderr).unwrap();
-        eprintln!("stderr: {}", err);
-        eprintln!("count: {}", out.chars().count());
         const COUNT_TRUE : usize = 104;
         match out.chars().count() {
             COUNT_TRUE => true,
