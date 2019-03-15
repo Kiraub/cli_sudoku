@@ -105,7 +105,7 @@ impl PartialEq for ActionType {
 
 pub struct Action {
     atype: ActionType,
-    pos: Point,
+    pos: Point<Value>,
     val: Value,
     htype: ActionType,
     map_key: String,
@@ -149,14 +149,14 @@ impl Action {
                     },
                     _ => {
                         if let Some(xstr) = input.next() {
-                            if let Some(x) = Value::parse(xstr) {
+                            if let Some(x) = Value::try_from(xstr) {
                                 if let Some(ystr) = input.next() {
-                                    if let Some(y) = Value::parse(ystr) {
-                                        let pos = Point{x, y};
+                                    if let Some(y) = Value::try_from(ystr) {
+                                        let pos = Point::new(x, y);
                                         if let ActionType::Erase = atype {
                                             Ok( Action{atype, pos, ..filler})
                                         } else if let Some(valstr) = input.next() {
-                                            if let Some(val) = Value::parse(valstr) {
+                                            if let Some(val) = Value::try_from(valstr) {
                                                 Ok( Action{atype, pos, val, ..filler})
                                             } else {unknown(valstr)}
                                         } else {missing("Number")}
@@ -172,14 +172,14 @@ impl Action {
 
     pub fn default_action() -> Action {
         use Value::Empty;
-        Action { atype: ActionType::Help, pos: Point{x: Empty, y: Empty}, val: Empty, htype: ActionType::Help, map_key: "".to_string(), map_value: "".to_string()}
+        Action { atype: ActionType::Help, pos: Point::new(Empty, Empty), val: Empty, htype: ActionType::Help, map_key: "".to_string(), map_value: "".to_string()}
     }
 
     pub fn get_type(&self) -> ActionType {
         self.atype
     }
 
-    pub fn get_position(&self) -> Point {
+    pub fn get_position(&self) -> Point<Value> {
         self.pos
     }
 

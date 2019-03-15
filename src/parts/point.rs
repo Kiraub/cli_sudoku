@@ -1,32 +1,40 @@
 
 use std::fmt;
-use super::value::Value;
 
-//TODO: Change this whole thing to use Generics
+// Use trait alias once it is out of experimental
+//trait PointCoord = Ord + fmt::Display + Copy + Clone;
 
 #[derive(Copy, Clone)]
-pub struct Point {
-    pub x: Value,
-    pub y: Value,
+pub struct Point<T> where
+    T: Ord + fmt::Display + Copy + Clone {
+    x: T,
+    y: T,
 }
 
-impl Point {
-    pub fn get_coord_x(&self) -> Value {
+impl<T> Point<T> where
+    T: Ord + fmt::Display + Copy + Clone {
+    pub fn new(x: T, y: T) -> Point<T> {
+        Point{x, y}
+    }
+
+    pub fn get_coord_x(&self) -> T {
         self.x
     }
 
-    pub fn get_coord_y(&self) -> Value {
+    pub fn get_coord_y(&self) -> T {
         self.y
     }
 }
 
-impl fmt::Display for Point {
+impl<T> fmt::Display for Point<T> where
+    T: Ord + fmt::Display + Copy + Clone {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "({}, {})", self.x, self.y)
+        write!(f, "({}, {})", self.get_coord_x(), self.get_coord_y())
     }
 }
 
-pub trait PointHandler<T: Ord> {
+pub trait PointHandler<T> where
+    T: Ord + fmt::Display + Copy + Clone {
     //TODO: extend this trait
 
     fn get_x_max(&self) -> T;

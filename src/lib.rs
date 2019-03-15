@@ -92,7 +92,7 @@ mod tests {
             point::Point,
             value::Value,
         };
-        let p = Point{x: Value::One, y: Value::Two};
+        let p = Point::new(Value::One, Value::Two);
         assert_eq!(format!("{}", p), "(1, 2)");
     }
 /*
@@ -119,7 +119,7 @@ mod tests {
         use parts::{
             value::Value,
         };
-        let a = Value::One.to_prolog();
+        let a = char::from(Value::One);
         assert_eq!(format!("{}", a), "a");
     }
 
@@ -141,7 +141,7 @@ mod tests {
             point::Point,
         };
         let b = Board::new();
-        let p = Point{x:Value::One,y:Value::One};
+        let p = Point::new(Value::One,Value::One);
         assert_eq!(format!("{}", b.check_fill(Value::One, p)), "true");
     }
 }

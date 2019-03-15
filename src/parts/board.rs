@@ -14,24 +14,24 @@ use super::{
     point::Point,
 };
 
-const XMAX: usize = 9;
-const YMAX: usize = 9;
-const VMAX: usize = 81;
-const XSPLIT: usize = 3;
-const YSPLIT: usize = 3;
-
 pub struct Board {
-    values: [Value; VMAX],
+    values: [Value; Board::VMAX],
 }
 
 impl Board {
+    pub const XMAX: usize = 9;
+    pub const YMAX: usize = 9;
+    pub const VMAX: usize = 81;
+    pub const XSPLIT: usize = 3;
+    pub const YSPLIT: usize = 3;
+
     pub fn new() -> Board {
-        let values : [Value; VMAX] = [Value::Empty; VMAX];
+        let values : [Value; Board::VMAX] = [Value::Empty; Board::VMAX];
         Board { values}
     }
 
     pub fn reset(&mut self) {
-        self.values = [Value::Empty; VMAX];
+        self.values = [Value::Empty; Board::VMAX];
     }
 
     //TODO: use trait ActionHandler
@@ -52,18 +52,18 @@ impl Board {
 
     pub fn to_prolog(&self) -> String {
         let mut prolog = String::new();
-        for y in 0..YMAX {
-            let row = &self.values[(y*XMAX)..(y*XMAX + XMAX)];
-            for x in 0..XMAX {
+        for y in 0..Board::YMAX {
+            let row = &self.values[(y*Board::XMAX)..(y*Board::XMAX + Board::XMAX)];
+            for x in 0..Board::XMAX {
                 let val = &row[x];
-                prolog.push( val.to_prolog());
+                prolog.push( char::from(*val));
             }
         }
         prolog
     }
 
-    pub fn check_fill(&self, val: Value, pos: Point) -> bool {
-        let r_string = val.to_prolog().to_string();
+    pub fn check_fill(&self, val: Value, pos: Point<Value>) -> bool {
+        let r_string = String::from(val);
         let r_index = Board::get_index(pos);
         let mut prolog_input = self.to_prolog();
         prolog_input.replace_range(r_index..r_index+1, &r_string );
@@ -92,26 +92,25 @@ impl Board {
         }
     }
 
-    fn get_index(pos: Point) -> usize {
-        let x = pos.get_coord_x().to_usize();
-        let y = pos.get_coord_y().to_usize();
-        (x-1) + (y-1)*XMAX
+    fn get_index(pos: Point<Value>) -> usize {
+        let x = usize::from(pos.get_coord_x());
+        let y = usize::from(pos.get_coord_y());
+        (x-1) + (y-1)*Board::XMAX
     }
 }
 
 impl fmt::Display for Board {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-
         let mut out = String::new();
-        for y in 0..YMAX {
-            let row = &self.values[(y*XMAX)..(y*XMAX + XMAX)];
-            if y>=YSPLIT && y % YSPLIT == 0 {
-                out.push_str(&"--".repeat(XMAX + (XMAX/XSPLIT) - 1));
+        for y in 0..Board::YMAX {
+            let row = &self.values[(y*Board::XMAX)..(y*Board::XMAX + Board::XMAX)];
+            if y>=Board::YSPLIT && y % Board::YSPLIT == 0 {
+                out.push_str(&"--".repeat(Board::XMAX + (Board::XMAX/Board::XSPLIT) - 1));
                 out.push_str("\n");
             }
-            for x in 0..XMAX {
+            for x in 0..Board::XMAX {
                 let val = &row[x];
-                if x>=XSPLIT && x % XSPLIT == 0 {
+                if x>=Board::XSPLIT && x % Board::XSPLIT == 0 {
                     out.push_str("| ");
                 }
                 out.push_str(&format!("{} ", &val));
