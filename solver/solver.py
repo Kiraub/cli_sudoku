@@ -1,3 +1,5 @@
+fail_if_not_atom = True
+
 startletter = 'A'
 endletter = 'I'
 samebox = [ ['A','B','C'], ['D','E','F'], ['G','H','I'] ]
@@ -22,7 +24,10 @@ main([_|H]):-\n\
     (H=[Arg|_],solver(Arg);write(\"false\")),\n\
     write(\">\").\n\
 "
-init += "\nsolver(Sample) :-\n    ((not(atom(Sample)),Isatom=no,Length=0);(atom(Sample),atom_length(Sample,Length),Isatom=yes)),\n    "
+init += "\nsolver(Sample) :-\n    ((not(atom(Sample)),Isatom=no,Length=0"
+if fail_if_not_atom:
+    init += ",fail"
+init += ");(atom(Sample),atom_length(Sample,Length),Isatom=yes)),\n    "
 for x in range( ord(startletter),ord(endletter)+1 ):
     for y in range( ord(startletter),ord(endletter)+1 ):
         varname = chr(x)+chr(y)
@@ -31,7 +36,7 @@ for x in range( ord(startletter),ord(endletter)+1 ):
         same = []
         #code += "\n%% "+varname+"\n"
         #code += "num("+varname+"),\n"
-        code += "((Isatom=yes,Length>"+str(counter)+",sub_atom(Sample, "+str(counter)+",1,_,"+varname+"E),(num("+varname+"E),"+varname+"="+varname+"E);(num("+varname+")));(Isatom=no;Length<"+str(counter+1)+")),\n"
+        code += "((Isatom=yes,Length>"+str(counter)+",sub_atom(Sample, "+str(counter)+",1,_,"+varname+"E),((num("+varname+"E),"+varname+"="+varname+"E);(empty("+varname+"E),num("+varname+"))));(Isatom=no;Length<"+str(counter+1)+")),\n"
         #code += ("\n%% set as number\n")
         #code += ");(Isatom=yes,sub_atom(Sample, "+str(counter)+",1,_,"+varname+"),num("+varname+"))),\n"
         counter += 1
