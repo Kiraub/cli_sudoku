@@ -10,8 +10,12 @@ use super::{
     action::{
         Action,
         ActionType,
+        ActionHandler,
     },
-    point::Point,
+    point::{
+        Point,
+        PointHandler,
+    },
 };
 
 pub struct Board {
@@ -19,42 +23,23 @@ pub struct Board {
 }
 
 impl Board {
-    pub const XMAX: usize = 9;
-    pub const YMAX: usize = 9;
-    pub const VMAX: usize = 81;
-    pub const XSPLIT: usize = 3;
-    pub const YSPLIT: usize = 3;
+    const VMAX: usize = 81;
+    const XSPLIT: usize = 3;
+    const YSPLIT: usize = 3;
+    const COUNT_TRUE : usize = 104;
 
     pub fn new() -> Board {
         let values : [Value; Board::VMAX] = [Value::Empty; Board::VMAX];
         Board { values}
     }
 
-    pub fn reset(&mut self) {
-        self.values = [Value::Empty; Board::VMAX];
-    }
-
-    //TODO: use trait ActionHandler
-    pub fn do_action(&mut self, action: Action) {
-        let pos = action.get_position();
-        match action.get_type() {
-            ActionType::Fill => {
-                if self.check_fill(action.get_value(), pos) {
-                    self.values[Board::get_index(pos)] = action.get_value();
-                }
-            },
-            ActionType::Erase => {
-                self.values[Board::get_index(pos)] = Value::Empty;
-            },
-            _ => (),
-        }
-    }
-
     pub fn to_prolog(&self) -> String {
+        let xmax = usize::from(self.get_x_max());
+        let ymax = usize::from(self.get_y_max());
         let mut prolog = String::new();
-        for y in 0..Board::YMAX {
-            let row = &self.values[(y*Board::XMAX)..(y*Board::XMAX + Board::XMAX)];
-            for x in 0..Board::XMAX {
+        for y in 0..ymax {
+            let row = &self.values[(y*xmax)..(y*xmax + xmax)];
+            for x in 0..xmax {
                 let val = &row[x];
                 prolog.push( char::from(*val));
             }
@@ -62,12 +47,12 @@ impl Board {
         prolog
     }
 
-    pub fn check_fill(&self, val: Value, pos: Point<Value>) -> bool {
-        let r_string = String::from(val);
-        let r_index = Board::get_index(pos);
+    fn check_fill(&self, val: Value, pos: Point<Value>) -> bool {
+        let r_char = char::from(val);
+        let r_index = self.get_index(pos);
         let mut prolog_input = self.to_prolog();
-        prolog_input.replace_range(r_index..r_index+1, &r_string );
-        //eprintln!("input: {}", &prolog_input);
+        prolog_input.replace_range(r_index..r_index+1, &r_char.to_string() );
+        //println!("{}", prolog_input);
         let prolog_output = if cfg!(target_os = "windows") {
             let mut win_pl_arg = String::from(".\\solver\\solver.exe ");
             win_pl_arg.push_str(&prolog_input);
@@ -85,30 +70,30 @@ impl Board {
                     .expect("failed to execute process")
         };
         let out = String::from_utf8(prolog_output.stdout).unwrap();
-        const COUNT_TRUE : usize = 104;
+        //println!("{}", out);
         match out.chars().count() {
-            COUNT_TRUE => true,
+            Board::COUNT_TRUE => true,
             _ => false,
         }
     }
 
-    fn get_index(pos: Point<Value>) -> usize {
-        let x = usize::from(pos.get_coord_x());
-        let y = usize::from(pos.get_coord_y());
-        (x-1) + (y-1)*Board::XMAX
+    fn reset(&mut self) {
+        self.values = [Value::Empty; Board::VMAX];
     }
 }
 
 impl fmt::Display for Board {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let xmax = usize::from(self.get_x_max());
+        let ymax = usize::from(self.get_y_max());
         let mut out = String::new();
-        for y in 0..Board::YMAX {
-            let row = &self.values[(y*Board::XMAX)..(y*Board::XMAX + Board::XMAX)];
+        for y in 0..ymax {
+            let row = &self.values[(y*xmax)..(y*xmax + xmax)];
             if y>=Board::YSPLIT && y % Board::YSPLIT == 0 {
-                out.push_str(&"--".repeat(Board::XMAX + (Board::XMAX/Board::XSPLIT) - 1));
+                out.push_str(&"--".repeat(xmax + (xmax/Board::XSPLIT) - 1));
                 out.push_str("\n");
             }
-            for x in 0..Board::XMAX {
+            for x in 0..xmax {
                 let val = &row[x];
                 if x>=Board::XSPLIT && x % Board::XSPLIT == 0 {
                     out.push_str("| ");
@@ -118,5 +103,48 @@ impl fmt::Display for Board {
             out.push('\n');
         }
         write!(f, "{}", out)
+    }
+}
+
+impl ActionHandler for Board {
+    fn do_action(&mut self, action: Action) -> String {
+        let pos = action.get_position();
+        match action.get_type() {
+            ActionType::Fill => {
+                if self.check_fill(action.get_value(), pos) {
+                    self.values[self.get_index(pos)] = action.get_value();
+                    String::from(format!("Filled in {} at {}", action.get_value(), action.get_position()))
+                } else {
+                    String::from(format!("Value {} is illegal at {}", action.get_value(), action.get_position()))
+                }
+            },
+            ActionType::Erase => {
+                self.values[self.get_index(pos)] = Value::Empty;
+                String::from(format!("Erased value at {}", action.get_position()))
+            },
+            ActionType::New => {
+                self.reset();
+                String::from("")
+            }
+            _ => String::from(format!("Cannot handle action type {}", action.get_type())),
+        }
+    }
+}
+
+impl PointHandler<Value> for Board {
+    fn get_x_min(&self) -> Value {
+        Value::min_value()
+    }
+
+    fn get_x_max(&self) -> Value {
+        Value::max_value()
+    }
+
+    fn get_y_min(&self) -> Value {
+        Value::min_value()
+    }
+
+    fn get_y_max(&self) -> Value {
+        Value::max_value()
     }
 }

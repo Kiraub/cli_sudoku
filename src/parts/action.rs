@@ -43,7 +43,7 @@ impl ActionType {
         println!("Use <help action> for action specific help.");
     }
 
-    fn print_help (&self) {
+    fn get_help (&self) -> String {
         use ActionType::*;
         let out = match self {
             Quit => "Quits the application.\nUsage:\n\tquit",
@@ -55,7 +55,7 @@ impl ActionType {
             Config => "Print or change the configuration.\nUsage:\n\tconfig [name value]",
             Help => {ActionType::get_list(); ""},
         };
-        println!("{}", out);
+        String::from(out)
     }
 }
 
@@ -102,6 +102,7 @@ impl PartialEq for ActionType {
         type_self == type_other
     }
 }
+impl Eq for ActionType { }
 
 pub struct Action {
     atype: ActionType,
@@ -195,8 +196,8 @@ impl Action {
         &self.map_value[..]
     }
 
-    pub fn get_help(&self) {
-        self.htype.print_help();
+    pub fn get_help(&self) -> String {
+        self.htype.get_help()
     }
 }
 

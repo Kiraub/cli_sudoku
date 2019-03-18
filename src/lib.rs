@@ -50,17 +50,23 @@ pub fn run(mut config: Config) -> Result<(), Box<dyn Error>> {
             Ok(act) => act,
             Err(msg) => {println!("{}", msg); Action::default_action()},
         };
-        match action.get_type() {
-            Quit => break,
-            New => board.reset(),
+        let atype = action.get_type();
+        let message = match atype {
+            Quit => String::from("quitting..."),
+            New => board.do_action(action),
             Help => action.get_help(),
-            Mark => println!("Not yet implemented"),
-            Unmark => println!("Not yet implemented"),
-            Config => println!("{}", config.do_action(action)),
+            Mark => String::from("Not yet implemented"),
+            Unmark => String::from("Not yet implemented"),
+            Config => String::from(format!("{}", config.do_action(action))),
             Fill => board.do_action(action),
             Erase => board.do_action(action),
+        };
+        if atype != Quit {
+            println!("\n\n{}\n{}", board, message);
+        } else {
+            println!("\n{}", message);
+            break;
         }
-        println!("\n\n{}", board);
     }
     Ok(())
 }
@@ -137,11 +143,11 @@ mod tests {
     fn check_fill_action() {
         use parts::{
             board::Board,
-            value::Value,
-            point::Point,
         };
-        let b = Board::new();
-        let p = Point::new(Value::One,Value::One);
-        assert_eq!(format!("{}", b.check_fill(Value::One, p)), "true");
+        let mut b = Board::new();
+        let a = Action::parse("fill 1 1 1").unwrap();
+        assert_eq!(format!("{}", b.to_prolog()), "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+        assert_eq!(format!("{}", b.do_action(a)), "Filled in 1 at (1, 1)");
+        assert_eq!(format!("{}", b.to_prolog()), "1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
     }
 }

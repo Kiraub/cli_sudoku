@@ -1,5 +1,7 @@
 
-use std::fmt;
+use std::{
+    fmt,
+};
 
 // Use trait alias once it is out of experimental
 //trait PointCoord = Ord + fmt::Display + Copy + Clone;
@@ -34,11 +36,21 @@ impl<T> fmt::Display for Point<T> where
 }
 
 pub trait PointHandler<T> where
-    T: Ord + fmt::Display + Copy + Clone {
-    //TODO: extend this trait
+    T: Ord + fmt::Display + Copy + Clone,
+    usize: From<T> {
+
+    fn get_x_min(&self) -> T;
 
     fn get_x_max(&self) -> T;
 
+    fn get_y_min(&self) -> T;
+
     fn get_y_max(&self) -> T;
 
+    fn get_index(&self, pos: Point<T>) -> usize {
+        let xmax = usize::from(self.get_x_max());
+        let x = usize::from(pos.get_coord_x());
+        let y = usize::from(pos.get_coord_y());
+        (x-1) + (y-1) * xmax
+    }
 }
