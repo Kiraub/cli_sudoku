@@ -22,8 +22,21 @@ main([_|H]):-
     write(">").
 
 solver(Sample) :-
-    ((not(atom(Sample)),Isatom=no,Length=0,fail);(atom(Sample),atom_length(Sample,Length),Isatom=yes)),
-    ((Isatom=yes,Length>0,sub_atom(Sample, 0,1,_,AAE),((num(AAE),AA=AAE);(empty(AAE),num(AA))));(Isatom=no;Length<1)),
+    (
+        not(atom(Sample))
+        -> Length=0
+        ; atom_length(Sample,Length)
+    ),
+    %
+    (Length>0
+        ->(
+            sub_atom(Sample, 0,1,_,AAE),
+            not(empty(AAE))
+            -> AA=AAE
+            ; num(AA)
+        )
+        ;num(AA)
+    ),
     
     ((Isatom=yes,Length>1,sub_atom(Sample, 1,1,_,ABE),((num(ABE),AB=ABE);(empty(ABE),num(AB))));(Isatom=no;Length<2)),
     AB\=AA,

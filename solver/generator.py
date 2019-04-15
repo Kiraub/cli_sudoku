@@ -1,10 +1,12 @@
 fail_if_not_atom = True
+print_sudoku_if_found = False
 
 startletter = 'A'
 endletter = 'I'
 samebox = [ ['A','B','C'], ['D','E','F'], ['G','H','I'] ]
 init = ""
 code = ""
+string_list = ""
 counter = 0
 init += "empty('x').\n"
 for l in range( ord(startletter),ord(endletter)+1 ):
@@ -24,10 +26,13 @@ main([_|H]):-\n\
     (H=[Arg|_],solver(Arg);write(\"false\")),\n\
     write(\">\").\n\
 "
-init += "\nsolver(Sample) :-\n    ((not(atom(Sample)),Isatom=no,Length=0"
+init += "\nsolver(Sample) :-\n\
+    (not(atom(Sample))->"
 if fail_if_not_atom:
-    init += ",fail"
-init += ");(atom(Sample),atom_length(Sample,Length),Isatom=yes)),\n    "
+    init += "fail"
+else:
+    init += "Length=0"
+init += ";atom_length(Sample,Length)),\n    "
 for x in range( ord(startletter),ord(endletter)+1 ):
     for y in range( ord(startletter),ord(endletter)+1 ):
         varname = chr(x)+chr(y)
@@ -36,7 +41,12 @@ for x in range( ord(startletter),ord(endletter)+1 ):
         same = []
         #code += "\n%% "+varname+"\n"
         #code += "num("+varname+"),\n"
-        code += "((Isatom=yes,Length>"+str(counter)+",sub_atom(Sample, "+str(counter)+",1,_,"+varname+"E),((num("+varname+"E),"+varname+"="+varname+"E);(empty("+varname+"E),num("+varname+"))));(Isatom=no;Length<"+str(counter+1)+")),\n"
+        #code += "((Isatom=yes,Length>"+str(counter)+",sub_atom(Sample, "+str(counter)+",1,_,"+varname+"E),((num("+varname+"E),"+varname+"="+varname+"E);(empty("+varname+"E),num("+varname+"))));(Isatom=no;Length<"+str(counter+1)+")),\n"
+        code += "(Length>"+str(counter)
+        code += "->(sub_atom(Sample, "+str(counter)+",1,_,"+varname+"E),"
+        code += "not(empty("+varname+"E))"
+        code += "->"+varname+"="+varname+"E;num("+varname+"))"
+        code += ";num("+varname+")),\n"
         #code += ("\n%% set as number\n")
         #code += ");(Isatom=yes,sub_atom(Sample, "+str(counter)+",1,_,"+varname+"),num("+varname+"))),\n"
         counter += 1
@@ -79,23 +89,27 @@ for x in range( ord(startletter),ord(endletter)+1 ):
                         code += varname+"\\="+xb+yb+","
         code += '\n'
     code += '\n'
-code += "write(\"true\")."
-#code += "write(\"###Start\\n\"),\n"
-"""
-string_list = "atom_list_concat(["
-for x in range( ord(startletter),ord(endletter)+1 ):
-    for y in range( ord(startletter),ord(endletter)+1 ):
-        varname = chr(x)+chr(y)
-        #code += "write("+varname+"),"
-        #code += "term_string("+varname+","+varname+"string),"
-        if x != ord(startletter) or y > ord(startletter):
-            string_list += ","
-        string_list += varname
-    #code += "\n"
-string_list += "],LongAtom),\nterm_string(LongAtom,LongString),\nwrite(\"Solution\\n\\t\"),\nwrite(LongString),\nwrite(\"\\n\"),\nfail."
-"""
-#code += "write(\"###End\\n\"),\n"
-#code += "\nfail."
+
+if print_sudoku_if_found:
+    #code += "write(\"###Start\\n\"),\n"
+    
+    string_list = "atom_list_concat(["
+    for x in range( ord(startletter),ord(endletter)+1 ):
+        for y in range( ord(startletter),ord(endletter)+1 ):
+            varname = chr(x)+chr(y)
+            #code += "write("+varname+"),"
+            #code += "term_string("+varname+","+varname+"string),"
+            if x != ord(startletter) or y > ord(startletter):
+                string_list += ","
+            string_list += varname
+        #code += "\n"
+    string_list += "],LongAtom),\nterm_string(LongAtom,LongString),\nwrite(\"Solution\\n\\t\"),\nwrite(LongString),\nwrite(\"\\n\"),\nfail."
+    
+    #code += "write(\"###End\\n\"),\n"
+    #code += "\nfail."
+else:
+    code += "write(\"true\")."
+
 print(init, end="")
 print(code.replace("\n","\n    "), end="")
-#print(string_list)
+print(string_list)
