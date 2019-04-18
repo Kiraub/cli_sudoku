@@ -6,8 +6,8 @@ use std::{
         Write,
     },
 };
-mod parts;
-use parts::{
+mod sudoku_parts;
+use sudoku_parts::{
     action::Action,
     action::ActionType,
     action::ActionHandler,
@@ -79,7 +79,7 @@ mod tests {
 
     #[test]
     fn format_values() {
-        use parts::value::Value::*;
+        use sudoku_parts::value::Value::*;
         assert_eq!(format!("{}", One), "1");
         assert_eq!(format!("{}", Two), "2");
         assert_eq!(format!("{}", Three), "3");
@@ -94,7 +94,7 @@ mod tests {
 
     #[test]
     fn format_points() {
-        use parts::{
+        use sudoku_parts::{
             point::Point,
             value::Value,
         };
@@ -113,7 +113,7 @@ mod tests {
 */
     #[test]
     fn parse_action() {
-        use parts::{
+        use sudoku_parts::{
             action::Action,
         };
         let a = Action::parse("mark 1 1 1").unwrap();
@@ -122,7 +122,7 @@ mod tests {
 
     #[test]
     fn prolog_value() {
-        use parts::{
+        use sudoku_parts::{
             value::Value,
         };
         let a = char::from(Value::One);
@@ -131,7 +131,7 @@ mod tests {
 
     #[test]
     fn board_to_prolog() {
-        use parts::{
+        use sudoku_parts::{
             board::Board,
         };
         let b = Board::new();
@@ -141,7 +141,7 @@ mod tests {
 
     #[test]
     fn check_fill_action() {
-        use parts::{
+        use sudoku_parts::{
             board::Board,
         };
         let mut b = Board::new();
