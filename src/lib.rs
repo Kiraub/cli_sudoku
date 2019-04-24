@@ -6,6 +6,7 @@ use std::{
         Write,
     },
 };
+mod part_traits;
 mod sudoku_parts;
 use sudoku_parts::{
     action::Action,
