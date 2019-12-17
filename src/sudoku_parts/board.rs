@@ -26,7 +26,7 @@ impl Board {
     const VMAX: usize = 81;
     const XSPLIT: usize = 3;
     const YSPLIT: usize = 3;
-    const COUNT_TRUE : usize = 104;
+    const COUNT_TRUE : usize = 102;
 
     pub fn new() -> Board {
         let values : [Value; Board::VMAX] = [Value::Empty; Board::VMAX];
@@ -52,16 +52,17 @@ impl Board {
         let r_index = self.get_index(pos);
         let mut prolog_input = self.to_prolog();
         prolog_input.replace_range(r_index..r_index+1, &r_char.to_string() );
+        // DEBUG output
         //println!("{}", prolog_input);
         let prolog_output = if cfg!(target_os = "windows") {
-            let mut win_pl_arg = String::from(".\\solver\\solver.exe ");
+            let mut win_pl_arg = String::from(".\\solver\\solver.exe 0 ");
             win_pl_arg.push_str(&prolog_input);
             Command::new("cmd")
                    .args(&["/C", &win_pl_arg])
                    .output()
                    .expect("failed to execute process")
         } else {
-            let mut ux_pl_arg = String::from("swipl .\\solver\\solver.pl ");
+            let mut ux_pl_arg = String::from("swipl .\\solver\\solver.pl 0 ");
             ux_pl_arg.push_str(&prolog_input);
             Command::new("sh")
                     .arg("-c")
@@ -70,7 +71,11 @@ impl Board {
                     .expect("failed to execute process")
         };
         let out = String::from_utf8(prolog_output.stdout).unwrap();
-        //println!("{}", out);
+        let err = String::from_utf8(prolog_output.stderr).unwrap();
+        // DEBUG output
+        println!("solver output: {}", out);
+        println!("solver output length: {}", out.chars().count());
+        println!("solver error: {}", err);
         match out.chars().count() {
             Board::COUNT_TRUE => true,
             _ => false,

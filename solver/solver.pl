@@ -19,11 +19,14 @@ count_bound(BC, [H|T]) :-
     count_bound(BCC, T),
     (num(H)->BC is BCC+1;BC is BCC).
 count_bound(0,[]).
+:- use_module(library(main)).
 main([_,HC,Arg]):-
+    %trace,
     write("Input:<"),
     write(Arg),
     write(">Answer:<"),
-    (solver(HC,Arg);write("false")),
+    catch(atom_number(HC,HCN), _, HCN = HC),
+    (solver(HCN,Arg);write("false")),
     write(">").
 
 solver(HintAmount, Sample) :-
